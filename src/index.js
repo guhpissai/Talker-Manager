@@ -36,6 +36,22 @@ app.post('/login', validateLogin, (req, res) => {
   })
 })
 
+app.post('/talker', async (req, res) => {
+  const { name, age, talk: {watchedAt, rate } } = req.body;
+  const allTalkers = await readTalkerData()
+  const id = allTalkers.length + 1;
+  const newTalker = {
+    name,
+    age,
+    talk: {
+      watchedAt,
+      rate,
+    }
+  }
+  allTalkers = [...allTalkers, newTalker];
+  return res.status()
+})
+
 app.listen(PORT, () => {
   console.log('Online');
 });
