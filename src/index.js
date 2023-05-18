@@ -97,6 +97,15 @@ app.put('/talker/:id',
   return res.status(200).json(newObject);
 });
 
+app.delete('/talker/:id', validateToken, async (req, res) => {
+  const { id } = req.params;
+  const allTalkers = await readTalkerData();
+  const talkerIndex = allTalkers.findIndex((currTalker) => currTalker.id === Number(id));
+  allTalkers.splice(talkerIndex, 1);
+  await writeTalkerData(allTalkers);
+  return res.status(204).send();
+});
+
 app.listen(PORT, () => {
   console.log('Online');
 });
