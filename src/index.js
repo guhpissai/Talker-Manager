@@ -16,6 +16,8 @@ const {
   validateDateQuery,
   validateTwoQuerys,
   validateAllQuerys,
+  validateBodyRate,
+  validateIntegerRate,
 } = require('./Middlewares/middlewares');
 const randomToken = require('./randomToken');
 
@@ -135,21 +137,18 @@ app.delete('/talker/:id', validateToken, async (req, res) => {
   return res.status(204).send();
 });
 
-// app.patch('/talker/rate/:id', validateToken, async (req, res) => {
-//   const { id } req.params;
-//   const { rate } = req.body;
-//   if(!rate) {
-//     return res.status(400).json({
-//       "message": "O campo \"rate\" é obrigatório"
-//     })
-//   }
-//   if (rate < 1 || rate > 5 || !Number.isInteger(rate)) {
-//     return res.status(400).json({
-//       message: 'O campo "rate" deve ser um número inteiro entre 1 e 5',
-//     });
-//   }
-//   return res.status(204).send();
-// })
+app.patch('/talker/rate/:id', 
+validateToken, validateBodyRate, validateIntegerRate, async (req, res) => {
+  const { id } = req.params;
+  const { rate } = req.body;
+  const allTalkers = await readTalkerData();
+  const index = allTalkers.findIndex((talker) => talker.id === +id);
+  const filterById = allTalkers.filter((talker) => talker.id === +id);
+  filterById[0].talk.rate = rate;
+  const result = [...allTalkers.slice(0, index), filterById[0], ...allTalkers.slice(index + 1)];
+  writeTalkerData(result);
+  return res.status(204).send();
+});
 
 app.listen(PORT, () => {
   console.log('Online');
