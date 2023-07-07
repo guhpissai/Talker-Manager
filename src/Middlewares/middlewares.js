@@ -101,7 +101,7 @@ const validateTalk = (req, res, next) => {
   next();
 };
 
-const validateDataFormat = (req, res, next) => {
+const validateDateFormat = (req, res, next) => {
   const { talk: { watchedAt } } = req.body;
   const validateData = () => 
   /(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d/
@@ -160,14 +160,48 @@ const validateQueryRate = async (req, res, next) => {
   next();
 };
 
-const validateQuerys = async (req, res, next) => {
+const validateDateQuery = async (req, res, next) => {
+  if (!req.query.date) {
+    return next();
+  }
+  const watchedDate = req.query.date;
+  const pattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+  if (!pattern.test(watchedDate)) {
+    return res.status(400).json({
+      message: 'O parâmetro "date" deve ter o formato "dd/mm/aaaa"',
+    });
+  }
+  next();
+};
+
+const validateAllQuerys = async (req, res, next) => {
   const searchTerm = req.query.q;
   const rate = Number(req.query.rate);
+  const watchedDate = req.query.date;
   const allTalkers = await readTalkerData();
+  if (searchTerm && rate && watchedDate) {
+    const filterByName = allTalkers.filter((talker) => talker.name.includes(searchTerm));
+    const filterByRate = filterByName.filter((talker) => talker.talk.rate === rate);
+    const filterByDate = filterByRate.filter((talker) => talker.talk.watchedAt === watchedDate);
+    return res.status(200).send(filterByDate);
+  }
+  next();
+};
+
+const validateTwoQuerys = async (req, res, next) => {
+  const searchTerm = req.query.q;
+  const rate = Number(req.query.rate);
+  const watchedDate = req.query.date;
+  const allTalkers = await readTalkerData();
+  if (searchTerm && watchedDate) {
+    const filterByName = allTalkers.filter((talker) => talker.name.includes(searchTerm));
+    const filterByDate = filterByName.filter((talker) => talker.talk.watchedAt === watchedDate);
+    return res.status(200).send(filterByDate);
+  }
   if (searchTerm && rate) {
-    const findTalkersName = allTalkers.filter((talker) => talker.name.includes(searchTerm));
-    const findTalkersRate = findTalkersName.filter((talker) => talker.talk.rate === rate);
-    return res.status(200).send(findTalkersRate);
+    const filterByName = allTalkers.filter((talker) => talker.name.includes(searchTerm));
+    const filterByRate = filterByName.filter((talker) => talker.talk.rate === rate);
+    return res.status(200).send(filterByRate);
   }
   next();
 };
@@ -181,9 +215,11 @@ module.exports = {
   validateAge,
   validateRateNumber,
   validateTalk,
-  validateDataFormat,
+  validateDateFormat,
   validateRate,
   validateTalkerId,
   validateQueryRate,
-  validateQuerys,
+  validateDateQuery,
+  validateTwoQuerys,
+  validateAllQuerys,
 };

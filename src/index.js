@@ -8,12 +8,14 @@ const {
   validateName,
   validateAge, 
   validateTalk, 
-  validateTalkerId, 
-  validateDataFormat,
+  validateTalkerId,
   validateRateNumber,
   validateRate,
   validateQueryRate,
-  validateQuerys,
+  validateDateFormat,
+  validateDateQuery,
+  validateTwoQuerys,
+  validateAllQuerys,
 } = require('./Middlewares/middlewares');
 const randomToken = require('./randomToken');
 
@@ -33,17 +35,27 @@ app.get('/talker', validateTalkers, async (req, res) => {
   return res.status(200).send(allTalkers);
 });
 
-app.get('/talker/search?', validateToken, validateQueryRate, validateQuerys, async (req, res) => {
+app.get('/talker/search?', 
+validateToken, 
+validateQueryRate, 
+validateAllQuerys,
+validateTwoQuerys,
+validateDateQuery, async (req, res) => {
   const searchTerm = req.query.q;
   const rate = Number(req.query.rate);
+  const watchedDate = req.query.date;
   const allTalkers = await readTalkerData();
   if (searchTerm) {
-    const findTalkersName = allTalkers.filter((talker) => talker.name.includes(searchTerm));
-    return res.status(200).send(findTalkersName);
+    const filterByName = allTalkers.filter((talker) => talker.name.includes(searchTerm));
+    return res.status(200).send(filterByName);
   }
   if (rate) {
-    const findTalkersRate = allTalkers.filter((talker) => talker.talk.rate === rate);
-    return res.status(200).send(findTalkersRate);
+    const filterByRate = allTalkers.filter((talker) => talker.talk.rate === rate);
+    return res.status(200).send(filterByRate);
+  }
+  if (watchedDate) {
+    const filterByDate = allTalkers.filter((talker) => talker.talk.watchedAt === watchedDate);
+    return res.status(200).send(filterByDate);
   }
   return res.status(200).send(allTalkers);
 });
@@ -71,7 +83,7 @@ app.post('/talker',
   validateName, 
   validateAge, 
   validateTalk, 
-  validateDataFormat,
+  validateDateFormat,
   validateRate,
   validateRateNumber,
   async (req, res) => {
@@ -96,7 +108,7 @@ app.put('/talker/:id',
   validateName, 
   validateAge, 
   validateTalk, 
-  validateDataFormat,
+  validateDateFormat,
   validateRate,
   validateRateNumber,
   validateTalkerId, 
@@ -122,6 +134,22 @@ app.delete('/talker/:id', validateToken, async (req, res) => {
   await writeTalkerData(allTalkers);
   return res.status(204).send();
 });
+
+// app.patch('/talker/rate/:id', validateToken, async (req, res) => {
+//   const { id } req.params;
+//   const { rate } = req.body;
+//   if(!rate) {
+//     return res.status(400).json({
+//       "message": "O campo \"rate\" é obrigatório"
+//     })
+//   }
+//   if (rate < 1 || rate > 5 || !Number.isInteger(rate)) {
+//     return res.status(400).json({
+//       message: 'O campo "rate" deve ser um número inteiro entre 1 e 5',
+//     });
+//   }
+//   return res.status(204).send();
+// })
 
 app.listen(PORT, () => {
   console.log('Online');
