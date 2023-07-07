@@ -148,11 +148,26 @@ const validateTalkerId = async (req, res, next) => {
 };
 
 const validateQueryRate = async (req, res, next) => {
+  if(req.query.rate === undefined) {
+    return next();
+  }
   const rate = Number(req.query.rate);
   if (rate < 1 || rate > 5 || !Number.isInteger(rate)) {
     return res.status(400).json({
       message: 'O campo "rate" deve ser um número inteiro entre 1 e 5',
     });
+  }
+  next();
+};
+
+const validateQuerys = async (req, res, next) => {
+  const searchTerm = req.query.q;
+  const rate = Number(req.query.rate);
+  const allTalkers = await readTalkerData();
+  if (searchTerm && rate) {
+    const findTalkersName = allTalkers.filter((talker) => talker.name.includes(searchTerm));
+    const findTalkersRate = findTalkersName.filter((talker) => talker.talk.rate === rate);
+    return res.status(200).send(findTalkersRate);
   }
   next();
 };
@@ -170,4 +185,5 @@ module.exports = {
   validateRate,
   validateTalkerId,
   validateQueryRate,
+  validateQuerys,
 };

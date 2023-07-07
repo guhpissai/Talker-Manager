@@ -13,6 +13,7 @@ const {
   validateRateNumber,
   validateRate,
   validateQueryRate,
+  validateQuerys,
 } = require('./Middlewares/middlewares');
 const randomToken = require('./randomToken');
 
@@ -32,15 +33,10 @@ app.get('/talker', validateTalkers, async (req, res) => {
   return res.status(200).send(allTalkers);
 });
 
-app.get('/talker/search?', validateToken, validateQueryRate, async (req, res) => {
+app.get('/talker/search?', validateToken, validateQueryRate, validateQuerys, async (req, res) => {
   const searchTerm = req.query.q;
   const rate = Number(req.query.rate);
   const allTalkers = await readTalkerData();
-  if (searchTerm && rate) {
-    const findTalkersName = allTalkers.filter((talker) => talker.name.includes(searchTerm));
-    const findTalkersRate = findTalkersName.filter((talker) => talker.talk.rate === rate);
-    return res.status(200).send(findTalkersRate);
-  }
   if (searchTerm) {
     const findTalkersName = allTalkers.filter((talker) => talker.name.includes(searchTerm));
     return res.status(200).send(findTalkersName);
