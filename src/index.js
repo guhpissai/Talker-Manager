@@ -26,10 +26,23 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
+
 app.get('/talker', validateTalkers, async (req, res) => {
   const allTalkers = await readTalkerData();
   return res.status(200).send(allTalkers);
 });
+
+app.get('/talker/search?', validateToken, async (req, res) => {
+  const searchTerm = req.query.q
+  const allTalkers = await readTalkerData();
+  if(searchTerm) {
+    const searchTerm = req.query.q
+    const findTalkersName = allTalkers.filter((talker) => talker.name.includes(searchTerm))
+    return res.status(200).send(findTalkersName)
+  }
+  return res.status(200).send(allTalkers)
+})
+
 
 app.get('/talker/:id', async (req, res) => {
   const allTalkers = await readTalkerData();
@@ -96,6 +109,7 @@ app.put('/talker/:id',
   await writeTalkerData(result);
   return res.status(200).json(newObject);
 });
+
 
 app.delete('/talker/:id', validateToken, async (req, res) => {
   const { id } = req.params;
