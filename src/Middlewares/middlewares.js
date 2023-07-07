@@ -148,7 +148,7 @@ const validateTalkerId = async (req, res, next) => {
 };
 
 const validateQueryRate = async (req, res, next) => {
-  if  (req.query.rate === undefined) {
+  if (req.query.rate === undefined) {
     return next();
   }
   const rate = Number(req.query.rate);
