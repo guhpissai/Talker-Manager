@@ -12,6 +12,7 @@ const {
   validateDataFormat,
   validateRateNumber,
   validateRate,
+  validateQueryRate,
 } = require('./Middlewares/middlewares');
 const randomToken = require('./randomToken');
 
@@ -26,23 +27,30 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
-
 app.get('/talker', validateTalkers, async (req, res) => {
   const allTalkers = await readTalkerData();
   return res.status(200).send(allTalkers);
 });
 
-app.get('/talker/search?', validateToken, async (req, res) => {
-  const searchTerm = req.query.q
+app.get('/talker/search?', validateToken, validateQueryRate, async (req, res) => {
+  const searchTerm = req.query.q;
+  const rate = Number(req.query.rate);
   const allTalkers = await readTalkerData();
-  if(searchTerm) {
-    const searchTerm = req.query.q
-    const findTalkersName = allTalkers.filter((talker) => talker.name.includes(searchTerm))
-    return res.status(200).send(findTalkersName)
+  if (searchTerm && rate) {
+    const findTalkersName = allTalkers.filter((talker) => talker.name.includes(searchTerm));
+    const findTalkersRate = findTalkersName.filter((talker) => talker.talk.rate === rate);
+    return res.status(200).send(findTalkersRate);
   }
-  return res.status(200).send(allTalkers)
-})
-
+  if (searchTerm) {
+    const findTalkersName = allTalkers.filter((talker) => talker.name.includes(searchTerm));
+    return res.status(200).send(findTalkersName);
+  }
+  if (rate) {
+    const findTalkersRate = allTalkers.filter((talker) => talker.talk.rate === rate);
+    return res.status(200).send(findTalkersRate);
+  }
+  return res.status(200).send(allTalkers);
+});
 
 app.get('/talker/:id', async (req, res) => {
   const allTalkers = await readTalkerData();
@@ -109,7 +117,6 @@ app.put('/talker/:id',
   await writeTalkerData(result);
   return res.status(200).json(newObject);
 });
-
 
 app.delete('/talker/:id', validateToken, async (req, res) => {
   const { id } = req.params;
