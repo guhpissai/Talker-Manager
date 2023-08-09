@@ -8,19 +8,19 @@ Este repositório contém a aplicação Talker Manager, construída utilizando N
 
 A seguir estão listadas as rotas disponíveis na aplicação:
 
-### GET /talker
+### GET `/talker`
 
 Retorna o status 200 e um array com todas as pessoas palestrantes cadastradas.
 
-### GET /talker/:id
+### GET `/talker/:id`
 
 Retorna o status 200 e informações sobre uma pessoa palestrante com base no ID fornecido na rota.
 
-### POST /login
+### POST `/login`
 
 Este endpoint recebe no corpo da requisição os campos `email` e `password` e retorna um token aleatório de 16 caracteres como autenticação.
 
-### POST /talker
+### POST `/talker`
 
 Cadastra uma nova pessoa palestrante. O corpo da requisição deve estar no seguinte formato:
 
@@ -35,7 +35,7 @@ Cadastra uma nova pessoa palestrante. O corpo da requisição deve estar no segu
 }
 ```
 
-### PUT /talker/:id
+### PUT `/talker/:id`
 
 Edita os dados de uma pessoa palestrante com base no ID fornecido na rota. O corpo da requisição deve estar no seguinte formato:
 
@@ -52,11 +52,11 @@ Edita os dados de uma pessoa palestrante com base no ID fornecido na rota. O cor
 
 A requisição deve conter o token de autenticação no cabeçalho, no campo Authorization.
 
-### DELETE /talker/:id
+### DELETE `/talker/:id`
 
 Remove uma pessoa palestrante com base no ID fornecido na rota.
 
-### GET /talker/search
+### GET `/talker/search`
 
 Retorna um array de palestrantes que contenham em seu nome o termo pesquisado. Pode ser utilizado um dos seguintes parâmetros de consulta:
 
@@ -66,7 +66,7 @@ date=watchedDate: Filtra por data de palestra assistida.
 PATCH /talker/rate/:id
 Altera a avaliação de uma pessoa palestrante com base no ID fornecido na rota.
 
-### GET /talker/db
+### GET `/talker/db`
 
 Retorna um array com todas as pessoas palestrantes cadastradas.
 
