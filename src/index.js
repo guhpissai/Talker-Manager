@@ -37,20 +37,18 @@ app.get('/talker', validateTalkers, async (req, res) => {
 
 app.get('/talker/db', async (req, res) => {
   const [result] = await connection.execute('SELECT * FROM TalkerDB.talkers');
-  const talkers = result.map((talker) => {
-    return {
+  const talkers = result.map((talker) => ({
       name: talker.name,
       age: talker.age,
       id: talker.id,
       talk: {
         watchedAt: talker.talk_watched_at,
-        rate: talker.talk_rate
-      }
-    }
-  })
-  if(!talkers) return res.status(200).send([]);
+        rate: talker.talk_rate,
+      },
+    }));
+  if (!talkers) return res.status(200).send([]);
   return res.status(200).send(talkers);
-})
+});
 
 app.get('/talker/search?', 
 validateToken, 
@@ -167,4 +165,4 @@ validateToken, validateBodyRate, validateIntegerRate, async (req, res) => {
 
 app.listen(PORT, async () => {
   console.log(`TalkerDB esta sendo executado na porta ${PORT}`);
-})
+});
