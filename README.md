@@ -2,7 +2,7 @@
 
 ## Descrição
 
-Este repositório contém a aplicação TalkerApp, construída utilizando Node.js e o framework Express. A aplicação utiliza um banco de dados MySQL para armazenar informações sobre pessoas palestrantes. A única rota que possui conexão real com o banco de dados é a rota GET `/talker/db`.
+Este repositório contém a aplicação Talker Manager, construída utilizando Node.js e o framework Express. A aplicação utiliza um banco de dados MySQL para armazenar informações sobre pessoas palestrantes. A única rota que possui conexão real com o banco de dados é a rota GET `/talker/db`.
 
 ## Rotas
 
