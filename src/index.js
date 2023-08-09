@@ -1,4 +1,5 @@
-const express = require('express');
+const app = require('./app');
+const connection = require('./db/connection');
 const { readTalkerData, writeTalkerData } = require('./fsHelper');
 const { 
   validateTalkers, 
@@ -21,9 +22,6 @@ const {
 } = require('./Middlewares/middlewares');
 const randomToken = require('./randomToken');
 
-const app = express();
-app.use(express.json());
-
 const HTTP_OK_STATUS = 200;
 const PORT = process.env.PORT || '3001';
 
@@ -36,6 +34,23 @@ app.get('/talker', validateTalkers, async (req, res) => {
   const allTalkers = await readTalkerData();
   return res.status(200).send(allTalkers);
 });
+
+app.get('/talker/db', async (req, res) => {
+  const [result] = await connection.execute('SELECT * FROM TalkerDB.talkers');
+  const talkers = result.map((talker) => {
+    return {
+      name: talker.name,
+      age: talker.age,
+      id: talker.id,
+      talk: {
+        watchedAt: talker.talk_watched_at,
+        rate: talker.talk_rate
+      }
+    }
+  })
+  if(!talkers) return res.status(200).send([]);
+  return res.status(200).send(talkers);
+})
 
 app.get('/talker/search?', 
 validateToken, 
@@ -150,6 +165,6 @@ validateToken, validateBodyRate, validateIntegerRate, async (req, res) => {
   return res.status(204).send();
 });
 
-app.listen(PORT, () => {
-  console.log('Online');
-});
+app.listen(PORT, async () => {
+  console.log(`TalkerDB esta sendo executado na porta ${PORT}`);
+})
